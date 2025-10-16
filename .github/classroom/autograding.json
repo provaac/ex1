@@ -3,7 +3,7 @@
     {
       "name": "Tests ocults ex1",
       "setup": "python -m pip install --upgrade pip && if [ -f requirements.txt ]; then pip install -r requirements.txt; fi && if [ -f .hidden-tests/requirements.txt ]; then pip install -r .hidden-tests/requirements.txt; fi && pip install pytest",
-      "run": "set -e; TEST_PATH=$(find .hidden-tests -type f -name 'test_hidden.py' -print -quit); if [ -z \"$TEST_PATH\" ]; then echo 'test_hidden.py not found under .hidden-tests'; exit 2; fi; echo Executant: \"$TEST_PATH\"; TEST_DIR=$(dirname \"$TEST_PATH\"); pytest -q \"$TEST_DIR\"",
+      "run": "set -e; TEST_PATH=$(find .hidden-tests -type f -name 'test_hidden.py' -print -quit); if [ -z \"$TEST_PATH\" ]; then echo 'test_hidden.py not found under .hidden-tests'; exit 2; fi; echo Executant: \"$TEST_PATH\"; TEST_DIR=$(dirname \"$TEST_PATH\"); export PYTHONPATH=\"$PWD:$PYTHONPATH\"; pytest -q \"$TEST_DIR\"",
       "input": "",
       "output": "",
       "comparison": "included",
