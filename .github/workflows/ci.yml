@@ -21,7 +21,7 @@ jobs:
       - name: Checkout hidden tests
         uses: actions/checkout@v4
         with:
-          repository: org/ex1-tests   # ← CANVIA-HO al teu org/nom
+          repository: provaac/ex1-tests   # ← CANVIA-HO al teu org/nom
           path: .hidden-tests
           token: ${{ secrets.CLASSROOM_PAT }}
 
