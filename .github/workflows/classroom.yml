@@ -12,11 +12,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout student repo
+        uses: actions/checkout@v4
         with:
           fetch-depth: 1
 
-      - uses: actions/checkout@v4
+      - name: Checkout hidden tests (provaac/solver_ex1)
+        uses: actions/checkout@v4
         with:
           repository: provaac/solver_ex1
           ref: main
@@ -25,9 +27,16 @@ jobs:
           persist-credentials: false
           fetch-depth: 1
 
-      - uses: actions/setup-python@v5
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
           cache: "pip"
-          
-      - uses: education/autograding@v1
+
+      - name: Debug: list hidden tests dir
+        run: |
+          echo "Files under .hidden-tests (maxdepth 4):"
+          find .hidden-tests -maxdepth 4 -type f | sort || true
+
+      - name: Autograding
+        uses: education/autograding@v1
