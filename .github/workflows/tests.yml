@@ -1,54 +1,48 @@
-name: CI - ex1
+name: CI
 
 on:
   push:
   pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
 
     steps:
-      - name: Checkout student repository
+      # 1) Checkout del repo de l'alumne (creat des del template)
+      - name: Checkout student repo
+        uses: actions/checkout@v4
+
+      # 2) Checkout dels tests ocults (repo privat)
+      - name: Checkout hidden tests
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          repository: org/ex1-tests   # ← CANVIA-HO al teu org/nom
+          path: .hidden-tests
+          token: ${{ secrets.CLASSROOM_PAT }}
 
-      - name: Setup Python
+      # 3) Configura Python
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
+      # 4) Instala dependències (si en tens; opcional)
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          # Si els tests ocults tenen deps addicionals:
+          if [ -f .hidden-tests/requirements.txt ]; then pip install -r .hidden-tests/requirements.txt; fi
+          pip install pytest
 
-      - name: Generate dataset (si cal)
+      # 5) Executa només els tests ocults (o tots)
+      - name: Run hidden tests
         run: |
-          python tools/make_dataset.py || true
-
-      # === CHECKOUT REPO AMB EL TEST OCULT ===
-      - name: Checkout hidden tests repo
-        if: ${{ secrets.HIDDEN_TESTS_TOKEN != '' }}
-        uses: actions/checkout@v4
-        with:
-          repository: your-org/solver_ex1        # ⬅️ canvia-ho al teu repo amb test_hidden.py
-          token: ${{ secrets.HIDDEN_TESTS_TOKEN }}
-          path: hidden
-          fetch-depth: 1
-          persist-credentials: false
-
-      # === EXECUTA ELS TESTS OCULTS (i públics si vols) ===
-      - name: Run pytest (hidden + public)
-        run: |
-          # Públics (si en tens al template)
-          if [ -d tests ]; then
-            pytest -q tests || exit 1
-          fi
-          # Ocults (des del repo clonat)
-          if [ -f hidden/tests/test_hidden.py ]; then
-            pytest -q hidden/tests/test_hidden.py
-          fi
+          # Opció A: executar només els ocults
+          pytest -q .hidden-tests/tests/test_hidden.py
+          # Opció B (si tens més tests ocults): pytest -q .hidden-tests/tests
