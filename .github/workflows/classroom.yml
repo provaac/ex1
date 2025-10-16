@@ -12,20 +12,25 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout student repo
-        uses: actions/checkout@v4
-
-      - name: Checkout hidden tests
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          repository: provaac/ex1-tests        # ← CANVIA-HO
+          fetch-depth: 1
+
+      - uses: actions/checkout@v4
+        with:
+          repository: provaac/solver_ex1
+          ref: main
           path: .hidden-tests
           token: ${{ secrets.CLASSROOM_PAT }}
+          persist-credentials: false
+          fetch-depth: 1
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: "pip"
 
-      - name: Autograding
-        uses: education/autograding@v1
+      - name: Debug: tree
+        run: find .hidden-tests -maxdepth 3 -type f | sort || true
+
+      - uses: education/autograding@v1
