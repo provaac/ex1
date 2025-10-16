@@ -29,3 +29,5 @@ jobs:
         with:
           python-version: "3.11"
           cache: "pip"
+          
+      - uses: education/autograding@v1
