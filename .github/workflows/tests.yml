@@ -1,0 +1,58 @@
+name: CI - Autograding
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read  # mínim necessari
+
+    steps:
+      - name: Checkout student submission
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Generate dataset
+        run: |
+          python tools/make_dataset.py
+          test -f data/generated.csv
+
+      # ↓↓↓ Checkout del repo **ocult** (només si hi ha secret)
+      - name: Checkout hidden tests
+        if: ${{ secrets.HIDDEN_TESTS_TOKEN != '' }}
+        uses: actions/checkout@v4
+        with:
+          repository: your-org/hidden-tests-exercici1   # 👈 canvia-ho
+          token: ${{ secrets.HIDDEN_TESTS_TOKEN }}
+          path: hidden-tests
+          fetch-depth: 1
+          persist-credentials: false   # no propagues el token a futurs passos per seguretat
+
+      - name: Run pytest (public + hidden si n'hi ha)
+        run: |
+          if [ -d hidden-tests/tests ]; then
+            mkdir -p tests_all
+            cp -r tests/* tests_all/        # públics
+            cp -r hidden-tests/tests/* tests_all/   # ocults
+            pytest -q tests_all
+          else
+            pytest -q tests
+          fi
+
+      # (Opcional) si uses autograding.json
+      # - name: Autograding
+      #   uses: education/autograding@v1
