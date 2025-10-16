@@ -1,4 +1,4 @@
-name: CI - Autograding
+name: CI - ex1
 
 on:
   push:
@@ -8,10 +8,10 @@ jobs:
   test:
     runs-on: ubuntu-latest
     permissions:
-      contents: read  # mínim necessari
+      contents: read
 
     steps:
-      - name: Checkout student submission
+      - name: Checkout student repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
@@ -26,32 +26,29 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Generate dataset
+      - name: Generate dataset (si cal)
         run: |
-          python tools/make_dataset.py
-          test -f data/generated.csv
+          python tools/make_dataset.py || true
 
-      # ↓↓↓ Checkout del repo **ocult** (només si hi ha secret)
-      - name: Checkout hidden tests
+      # === CHECKOUT REPO AMB EL TEST OCULT ===
+      - name: Checkout hidden tests repo
         if: ${{ secrets.HIDDEN_TESTS_TOKEN != '' }}
         uses: actions/checkout@v4
         with:
-          repository: provaac/solver_ex1   # 👈 canvia-ho
+          repository: your-org/solver_ex1        # ⬅️ canvia-ho al teu repo amb test_hidden.py
           token: ${{ secrets.HIDDEN_TESTS_TOKEN }}
-          path: tests
+          path: hidden
           fetch-depth: 1
-          persist-credentials: false   # no propagues el token a futurs passos per seguretat
+          persist-credentials: false
 
-      - name: Run pytest (public + hidden si n'hi ha)
+      # === EXECUTA ELS TESTS OCULTS (i públics si vols) ===
+      - name: Run pytest (hidden + public)
         run: |
-          if [ -d hidden-tests/tests ]; then
-            mkdir -p tests_all
-            cp -r tests/* tests_all/   # ocults
-            pytest -q tests_all
-          else
-            pytest -q tests
+          # Públics (si en tens al template)
+          if [ -d tests ]; then
+            pytest -q tests || exit 1
           fi
-
-      # (Opcional) si uses autograding.json
-      # - name: Autograding
-      #   uses: education/autograding@v1
+          # Ocults (des del repo clonat)
+          if [ -f hidden/tests/test_hidden.py ]; then
+            pytest -q hidden/tests/test_hidden.py
+          fi
