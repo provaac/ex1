@@ -29,8 +29,3 @@ jobs:
         with:
           python-version: "3.11"
           cache: "pip"
-
-      - name: Debug: tree
-        run: find .hidden-tests -maxdepth 3 -type f | sort || true
-
-      - uses: education/autograding@v1
