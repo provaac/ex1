@@ -36,9 +36,9 @@ jobs:
         if: ${{ secrets.HIDDEN_TESTS_TOKEN != '' }}
         uses: actions/checkout@v4
         with:
-          repository: your-org/hidden-tests-exercici1   # 👈 canvia-ho
+          repository: provaac/solver_ex1   # 👈 canvia-ho
           token: ${{ secrets.HIDDEN_TESTS_TOKEN }}
-          path: hidden-tests
+          path: tests
           fetch-depth: 1
           persist-credentials: false   # no propagues el token a futurs passos per seguretat
 
@@ -46,8 +46,7 @@ jobs:
         run: |
           if [ -d hidden-tests/tests ]; then
             mkdir -p tests_all
-            cp -r tests/* tests_all/        # públics
-            cp -r hidden-tests/tests/* tests_all/   # ocults
+            cp -r tests/* tests_all/   # ocults
             pytest -q tests_all
           else
             pytest -q tests
