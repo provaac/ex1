@@ -11,7 +11,6 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout student repo
         uses: actions/checkout@v4
@@ -21,10 +20,10 @@ jobs:
       - name: Checkout hidden tests (provaac/solver_ex1)
         uses: actions/checkout@v4
         with:
-          repository: provaac/solver_ex1       # ← repo de tests de la captura
-          ref: main                            # canvia-ho si la branca no és main
+          repository: provaac/solver_ex1
+          ref: main                 # canvia-ho si la branca no és main
           path: .hidden-tests
-          token: ${{ secrets.CLASSROOM_PAT }}  # secret d'org amb permís de lectura
+          token: ${{ secrets.CLASSROOM_PAT }}
           persist-credentials: false
           fetch-depth: 1
 
@@ -41,5 +40,18 @@ jobs:
           if [ -f .hidden-tests/requirements.txt ]; then pip install -r .hidden-tests/requirements.txt; fi
           pip install pytest
 
-      - name: Run hidden tests
-        run: pytest -q .hidden-tests/solver_ex1/tests/test_hidden.py
+      - name: Debug: list hidden tests dir
+        run: |
+          echo "Files under .hidden-tests (maxdepth 4):"
+          find .hidden-tests -maxdepth 4 -type f | sort || true
+
+      - name: Run hidden tests (auto-discovery)
+        run: |
+          set -e
+          TEST_PATH=$(find .hidden-tests -type f -name 'test_hidden.py' -print -quit)
+          if [ -z "$TEST_PATH" ]; then
+            echo "No s'ha trobat cap test_hidden.py dins .hidden-tests/"
+            exit 2
+          fi
+          echo "Executant pytest sobre el directori: $(dirname "$TEST_PATH")"
+          pytest -q "$(dirname "$TEST_PATH")"
