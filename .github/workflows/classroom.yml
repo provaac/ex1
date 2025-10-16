@@ -1,0 +1,31 @@
+name: GitHub Classroom Autograder
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout student repo
+        uses: actions/checkout@v4
+
+      - name: Checkout hidden tests
+        uses: actions/checkout@v4
+        with:
+          repository: provaac/ex1-tests        # ← CANVIA-HO
+          path: .hidden-tests
+          token: ${{ secrets.CLASSROOM_PAT }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Autograding
+        uses: education/autograding@v1
