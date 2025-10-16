@@ -18,13 +18,13 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Checkout hidden tests
+      - name: Checkout hidden tests (provaac/solver_ex1)
         uses: actions/checkout@v4
         with:
-          repository: provaac/ex1-tests     # owner/repo exactes
-          ref: main                         # canvia-ho si la branca no és main
+          repository: provaac/solver_ex1       # ← repo de tests de la captura
+          ref: main                            # canvia-ho si la branca no és main
           path: .hidden-tests
-          token: ${{ secrets.CLASSROOM_PAT }}
+          token: ${{ secrets.CLASSROOM_PAT }}  # secret d'org amb permís de lectura
           persist-credentials: false
           fetch-depth: 1
 
@@ -38,3 +38,13 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f .hidden-tests/requirements.txt ]; then pip install -r .hidden-tests/requirements.txt; fi
+          pip install pytest
+
+      - name: Debug: comprova que existeix el test
+        run: |
+          echo "Contingut .hidden-tests:"
+          find .hidden-tests -maxdepth 3 -type f | sort || true
+
+      - name: Run hidden tests
+        run: pytest -q .hidden-tests/solver_ex1/tests/test_hidden.py
