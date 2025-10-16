@@ -54,4 +54,6 @@ jobs:
             exit 2
           fi
           echo "Executant pytest sobre el directori: $(dirname "$TEST_PATH")"
+          export PYTHONPATH="$PWD:$PYTHONPATH"   # <- assegura que 'solucio.py' s'importa
           pytest -q "$(dirname "$TEST_PATH")"
+
