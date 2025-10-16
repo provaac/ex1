@@ -13,36 +13,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1) Checkout del repo de l'alumne (creat des del template)
       - name: Checkout student repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
-      # 2) Checkout dels tests ocults (repo privat)
       - name: Checkout hidden tests
         uses: actions/checkout@v4
         with:
-          repository: provaac/ex1-tests   # ← CANVIA-HO al teu org/nom
+          repository: provaac/ex1-tests     # owner/repo exactes
+          ref: main                         # canvia-ho si la branca no és main
           path: .hidden-tests
           token: ${{ secrets.CLASSROOM_PAT }}
+          persist-credentials: false
+          fetch-depth: 1
 
-      # 3) Configura Python
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: "pip"
 
-      # 4) Instala dependències (si en tens; opcional)
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          # Si els tests ocults tenen deps addicionals:
-          if [ -f .hidden-tests/requirements.txt ]; then pip install -r .hidden-tests/requirements.txt; fi
-          pip install pytest
-
-      # 5) Executa només els tests ocults (o tots)
-      - name: Run hidden tests
-        run: |
-          # Opció A: executar només els ocults
-          pytest -q .hidden-tests/tests/test_hidden.py
-          # Opció B (si tens més tests ocults): pytest -q .hidden-tests/tests
