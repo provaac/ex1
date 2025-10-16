@@ -2,8 +2,8 @@
   "tests": [
     {
       "name": "Tests ocults ex1",
-      "setup": "python -m pip install --upgrade pip && if [ -f requirements.txt ]; then pip install -r requirements.txt; fi && pip install pytest && if [ -f .hidden-tests/requirements.txt ]; then pip install -r .hidden-tests/requirements.txt; fi",
-      "run": "pytest -q .hidden-tests/tests/test_hidden.py",
+      "setup": "python -m pip install --upgrade pip && if [ -f requirements.txt ]; then pip install -r requirements.txt; fi && if [ -f .hidden-tests/requirements.txt ]; then pip install -r .hidden-tests/requirements.txt; fi && pip install pytest",
+      "run": "pytest -q .hidden-tests/solver_ex1/tests/test_hidden.py",
       "input": "",
       "output": "",
       "comparison": "included",
