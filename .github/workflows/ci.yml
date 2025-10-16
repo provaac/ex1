@@ -41,10 +41,5 @@ jobs:
           if [ -f .hidden-tests/requirements.txt ]; then pip install -r .hidden-tests/requirements.txt; fi
           pip install pytest
 
-      - name: Debug: comprova que existeix el test
-        run: |
-          echo "Contingut .hidden-tests:"
-          find .hidden-tests -maxdepth 3 -type f | sort || true
-
       - name: Run hidden tests
         run: pytest -q .hidden-tests/solver_ex1/tests/test_hidden.py
